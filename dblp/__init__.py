@@ -41,7 +41,22 @@ class Author(LazyAPIData):
                                       'homonyms'])
 
     def load_data(self):
-        resp = requests.get(DBLP_PERSON_URL.format(urlpt=self.urlpt))
+        global timeoutCount
+        timeoutCount = 0
+        global passFail
+        passFail = 0
+        while (passFail == 0):
+            try:
+                resp = requests.get(DBLP_PERSON_URL.format(urlpt=self.urlpt))
+                passFail = 1
+            # if connection times out, try again until it work or failed 5 times
+            except:
+                if (timeoutCount < 5):
+                    passFail = 0
+                    timeoutCount = timeoutCount + 1
+                else:
+                    print("ERROR: failed to connect to DBLP 5+ times for"+str(self.urlpt)+", skipping")
+                    passFail = 1
         # TODO error handling
         xml = resp.content
         self.xml = xml
@@ -104,7 +119,23 @@ class Publication(LazyAPIData):
                 'series'])
 
     def load_data(self):
-        resp = requests.get(DBLP_PUBLICATION_URL.format(key=self.key))
+        global timeoutCount2
+        timeoutCount2 = 0
+        global passFail2
+        passFail2 = 0
+        while (passFail2 == 0):
+            try:
+                resp = requests.get(DBLP_PUBLICATION_URL.format(key=self.key))
+                passFail2 = 1
+            # if connection times out, try again until it work or failed 5 times
+            except:
+                if (timeoutCount2 < 5):
+                    passFail2 = 0
+                    timeoutCount2 = timeoutCount2 + 1
+                else:
+                    print("ERROR: failed to connect to DBLP 5+ times for"+str(self.key)+", skipping")
+                    passFail2 = 1
+
         xml = resp.content
         self.xml = xml
         root = etree.fromstring(xml)
@@ -141,7 +172,23 @@ class Publication(LazyAPIData):
         self.data = data
 
 def search(author_str):
-    resp = requests.get(DBLP_AUTHOR_SEARCH_URL, params={'xauthor':author_str})
+    global timeoutCount3
+    timeoutCount3 = 0
+    global passFail3
+    passFail3 = 0
+    while (passFail3 == 0):
+        try:
+            resp = requests.get(DBLP_AUTHOR_SEARCH_URL, params={'xauthor':author_str})
+            passFail3 = 1
+        # if connection times out, try again until it work or failed 5 times
+        except:
+            if (timeoutCount < 5):
+                passFail3 = 0
+                timeoutCount3 = timeoutCount3 + 1
+            else:
+                print("ERROR: failed to connect to DBLP 5+ times for"+str(author_str)+", skipping")
+                passFail3 = 1
+
     #TODO error handling
     root = etree.fromstring(resp.content)
     arr_of_authors = []
