@@ -41,15 +41,13 @@ class Author(LazyAPIData):
                                       'homonyms'])
 
     def load_data(self):
-        global timeoutCount
         timeoutCount = 0
-        global passFail
         passFail = 0
         while (passFail == 0):
             try:
                 resp = requests.get(DBLP_PERSON_URL.format(urlpt=self.urlpt))
                 passFail = 1
-            # if connection times out, try again until it work or failed 5 times
+            # if connection times out, try again until it works or failed 5 times
             except:
                 if (timeoutCount < 5):
                     passFail = 0
@@ -119,15 +117,13 @@ class Publication(LazyAPIData):
                 'series'])
 
     def load_data(self):
-        global timeoutCount2
         timeoutCount2 = 0
-        global passFail2
         passFail2 = 0
         while (passFail2 == 0):
             try:
                 resp = requests.get(DBLP_PUBLICATION_URL.format(key=self.key))
                 passFail2 = 1
-            # if connection times out, try again until it work or failed 5 times
+            # if connection times out, try again until it works or failed 5 times
             except:
                 if (timeoutCount2 < 5):
                     passFail2 = 0
@@ -166,23 +162,21 @@ class Publication(LazyAPIData):
             'citations':[Citation(c.text, c.attrib.get('label',None))
                          for c in publication.xpath('cite') if c.text != '...'],
             'series':first_or_none(Series(s.text, s.attrib.get('href', None))
-                      for s in publication.xpath('series'))
+                    for s in publication.xpath('series'))
         }
 
         self.data = data
 
 def search(author_str):
-    global timeoutCount3
     timeoutCount3 = 0
-    global passFail3
     passFail3 = 0
     while (passFail3 == 0):
         try:
             resp = requests.get(DBLP_AUTHOR_SEARCH_URL, params={'xauthor':author_str})
             passFail3 = 1
-        # if connection times out, try again until it work or failed 5 times
+        # if connection times out, try again until it works or failed 5 times
         except:
-            if (timeoutCount < 5):
+            if (timeoutCount3 < 5):
                 passFail3 = 0
                 timeoutCount3 = timeoutCount3 + 1
             else:
