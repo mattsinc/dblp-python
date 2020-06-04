@@ -66,10 +66,7 @@ def parallel_search(threadNum):
             # ensures the "right" architect with this name is not ignored because they weren't the first
             # match
             for currAuthor in currAuthors:
-                #global count
                 count = 0 # reset count for each person
-                # since the currAuthor fields are loaded lazily, need to access fields with a lock
-                #with lock:
                 numPubs = len(currAuthor.publications)
                 ##print("    Thread "+threadNumStr+": "+str(numPubs)+" DBLP entries.  ISCA publications, if any:") # DEBUG PRINT
                 outFile_thr.write('    '+str(numPubs)+' DBLP entries.  ISCA publications, if any:\n') # DEBUG PRINT
