@@ -33,6 +33,7 @@ chairWelcome1 = "Proceedings of the"
 chairWelcome2 = "International Symposium on Computer Architecture"
 numThreads = multiprocessing.cpu_count()
 lock = threading.Lock() # for searching DBLP
+# currently don't use this lock, because the insertions don't need to have a strict order
 lockInsert = threading.Lock() # for inserting into shared arrays
 
 def parallel_search(threadNum):
