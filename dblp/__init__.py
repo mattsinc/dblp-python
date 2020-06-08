@@ -47,8 +47,25 @@ class Author(LazyAPIData):
         while (passFail == 0):
             try:
                 resp = requests.get(DBLP_PERSON_URL.format(urlpt=self.urlpt))
+
+                # TODO error handling
+                xml = resp.content
+                self.xml = xml
+                root = etree.fromstring(xml)
+                #root = etree.XML(xml)
+                data = {
+                    'name':root.attrib['name'],
+                    'publications':[Publication(k) for k in 
+                                    root.xpath('/dblpperson/dblpkey[not(@type)]/text()')],
+                    'homepages':root.xpath(
+                        '/dblpperson/dblpkey[@type="person record"]/text()'),
+                    'homonyms':root.xpath('/dblpperson/homonym/text()')
+                }
+
+                self.data = data
+
                 passFail = 1
-            # if connection times out, try again until it works or failed 5 times
+            # if connection times out or string is empty, try again until it works or failed 5 times
             except:
                 if (timeoutCount < 5):
                     passFail = 0
@@ -56,20 +73,6 @@ class Author(LazyAPIData):
                 else:
                     print("ERROR: failed to connect to DBLP 5+ times for"+str(self.urlpt)+", skipping")
                     passFail = 1
-        # TODO error handling
-        xml = resp.content
-        self.xml = xml
-        root = etree.fromstring(xml)
-        data = {
-            'name':root.attrib['name'],
-            'publications':[Publication(k) for k in 
-                            root.xpath('/dblpperson/dblpkey[not(@type)]/text()')],
-            'homepages':root.xpath(
-                '/dblpperson/dblpkey[@type="person record"]/text()'),
-            'homonyms':root.xpath('/dblpperson/homonym/text()')
-        }
-
-        self.data = data
 
 def first_or_none(seq):
     try:
@@ -123,8 +126,45 @@ class Publication(LazyAPIData):
         while (passFail2 == 0):
             try:
                 resp = requests.get(DBLP_PUBLICATION_URL.format(key=self.key))
+
+                xml = resp.content
+                self.xml = xml
+                root = etree.fromstring(xml)
+                #root = etree.XML(xml)
+                publication = first_or_none(root.xpath('/dblp/*[1]'))
+                if publication is None:
+                    raise ValueError
+                data = {
+                    'type':publication.tag,
+                    'sub_type':publication.attrib.get('publtype', None),
+                    'mdate':publication.attrib.get('mdate', None),
+                    'authors':publication.xpath('author/text()'),
+                    'editors':publication.xpath('editor/text()'),
+                    'title':first_or_none(publication.xpath('title/text()')),
+                    'year':int(first_or_none(publication.xpath('year/text()'))),
+                    'month':first_or_none(publication.xpath('month/text()')),
+                    'journal':first_or_none(publication.xpath('journal/text()')),
+                    'volume':first_or_none(publication.xpath('volume/text()')),
+                    'number':first_or_none(publication.xpath('number/text()')),
+                    'chapter':first_or_none(publication.xpath('chapter/text()')),
+                    'pages':first_or_none(publication.xpath('pages/text()')),
+                    'ee':first_or_none(publication.xpath('ee/text()')),
+                    'isbn':first_or_none(publication.xpath('isbn/text()')),
+                    'url':first_or_none(publication.xpath('url/text()')),
+                    'booktitle':first_or_none(publication.xpath('booktitle/text()')),
+                    'crossref':first_or_none(publication.xpath('crossref/text()')),
+                    'publisher':first_or_none(publication.xpath('publisher/text()')),
+                    'school':first_or_none(publication.xpath('school/text()')),
+                    'citations':[Citation(c.text, c.attrib.get('label',None))
+                                 for c in publication.xpath('cite') if c.text != '...'],
+                    'series':first_or_none(Series(s.text, s.attrib.get('href', None))
+                                           for s in publication.xpath('series'))
+                }
+
+                self.data = data
+
                 passFail2 = 1
-            # if connection times out, try again until it works or failed 5 times
+            # if connection times out or string is empty, try again until it works or failed 5 times
             except:
                 if (timeoutCount2 < 5):
                     passFail2 = 0
@@ -132,41 +172,6 @@ class Publication(LazyAPIData):
                 else:
                     print("ERROR: failed to connect to DBLP 5+ times for"+str(self.key)+", skipping")
                     passFail2 = 1
-
-        xml = resp.content
-        self.xml = xml
-        root = etree.fromstring(xml)
-        publication = first_or_none(root.xpath('/dblp/*[1]'))
-        if publication is None:
-            raise ValueError
-        data = {
-            'type':publication.tag,
-            'sub_type':publication.attrib.get('publtype', None),
-            'mdate':publication.attrib.get('mdate', None),
-            'authors':publication.xpath('author/text()'),
-            'editors':publication.xpath('editor/text()'),
-            'title':first_or_none(publication.xpath('title/text()')),
-            'year':int(first_or_none(publication.xpath('year/text()'))),
-            'month':first_or_none(publication.xpath('month/text()')),
-            'journal':first_or_none(publication.xpath('journal/text()')),
-            'volume':first_or_none(publication.xpath('volume/text()')),
-            'number':first_or_none(publication.xpath('number/text()')),
-            'chapter':first_or_none(publication.xpath('chapter/text()')),
-            'pages':first_or_none(publication.xpath('pages/text()')),
-            'ee':first_or_none(publication.xpath('ee/text()')),
-            'isbn':first_or_none(publication.xpath('isbn/text()')),
-            'url':first_or_none(publication.xpath('url/text()')),
-            'booktitle':first_or_none(publication.xpath('booktitle/text()')),
-            'crossref':first_or_none(publication.xpath('crossref/text()')),
-            'publisher':first_or_none(publication.xpath('publisher/text()')),
-            'school':first_or_none(publication.xpath('school/text()')),
-            'citations':[Citation(c.text, c.attrib.get('label',None))
-                         for c in publication.xpath('cite') if c.text != '...'],
-            'series':first_or_none(Series(s.text, s.attrib.get('href', None))
-                    for s in publication.xpath('series'))
-        }
-
-        self.data = data
 
 def search(author_str):
     timeoutCount3 = 0
@@ -184,16 +189,35 @@ def search(author_str):
                 print("ERROR: failed to connect to DBLP 5+ times for"+str(author_str)+", skipping")
                 passFail3 = 1
 
+    # TODO: Does this need to be a nested try-catch above with the resp?
     #TODO error handling
     root = etree.fromstring(resp.content)
     arr_of_authors = []
     for urlpt in root.xpath('/authors/author/@urlpt'):
-        resp1 = requests.get(DBLP_PERSON_URL.format(urlpt=urlpt))
-        xml = resp1.content
-        root1 = etree.fromstring(xml)
-        if root1.xpath('/dblpperson/homonym/text()'):
-            for hom_urlpt in root1.xpath('/dblpperson/homonym/text()'):
-                arr_of_authors.append(Author(hom_urlpt))
-        else:
-            arr_of_authors.append(Author(urlpt))
+        timeoutCount4 = 0
+        passFail4 = 0
+        while (passFail4 == 0):
+            try:
+                resp1 = requests.get(DBLP_PERSON_URL.format(urlpt=urlpt))
+
+                xml = resp1.content
+                root1 = etree.fromstring(xml)
+                #root1 = etree.XML(xml)
+                if root1.xpath('/dblpperson/homonym/text()'):
+                    for hom_urlpt in root1.xpath('/dblpperson/homonym/text()'):
+                        arr_of_authors.append(Author(hom_urlpt))
+                else:
+                    arr_of_authors.append(Author(urlpt))
+
+                passFail4 = 1
+
+            # if connection times out or string is empty, try again until it works or failed 5 times
+            except:
+                if (timeoutCount4 < 5):
+                    passFail4 = 0
+                    timeoutCount4 = timeoutCount4 + 1
+                else:
+                    print("ERROR: failed to connect to DBLP 5+ times for"+str(urlpt)+", skipping")
+                    passFail4 = 1
+
     return arr_of_authors
