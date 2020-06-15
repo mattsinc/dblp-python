@@ -52,7 +52,6 @@ class Author(LazyAPIData):
                 xml = resp.content
                 self.xml = xml
                 root = etree.fromstring(xml)
-                #root = etree.XML(xml)
                 data = {
                     'name':root.attrib['name'],
                     'publications':[Publication(k) for k in 
@@ -130,7 +129,6 @@ class Publication(LazyAPIData):
                 xml = resp.content
                 self.xml = xml
                 root = etree.fromstring(xml)
-                #root = etree.XML(xml)
                 publication = first_or_none(root.xpath('/dblp/*[1]'))
                 if publication is None:
                     raise ValueError
@@ -202,7 +200,6 @@ def search(author_str):
 
                 xml = resp1.content
                 root1 = etree.fromstring(xml)
-                #root1 = etree.XML(xml)
                 if root1.xpath('/dblpperson/homonym/text()'):
                     for hom_urlpt in root1.xpath('/dblpperson/homonym/text()'):
                         arr_of_authors.append(Author(hom_urlpt))
