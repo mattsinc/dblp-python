@@ -2,31 +2,12 @@ import dblp
 import jellyfish
 import time
 
-#inFile = open('dump-test.txt', mode = 'r')
 inFile = open('dump-sorted-uniq.txt', mode = 'r')
 lines = inFile.read()
 print(lines)
 inFile.close()
 myAuthors = []
 count = 0
-
-# # parse each line
-# #for currLine in lines:
-# #    # make sure line not empty
-# #    if (currLine):
-# #        print("Next line: "+str(currLine))
-#         # commas immediately after ' denote new author
-# #        currLineCommaSep = currLine.split("'")
-#         # split on non-espcaped '
-#         currLineCommaQuoteSep = currLineCommaSep#[i.split("\'") for i in currLineCommaSep]
-#         print("Comma, quote separated: "+str(currLineCommaQuoteSep))
-#         # parse input -- everything between non-escaped quotes is a new author to add to list
-#         for newAuthor in currLineCommaQuoteSep:
-#             print("Found author #"+str(count)+" : "+str(newAuthor))
-#             # add each author to list
-#             myAuthors.append(newAuthor)
-#             count = count + 1
-#             print("") # empty line between
 
 # split on non-espcaped '
 currLineCommaSep = lines.split(", ")
@@ -38,9 +19,7 @@ for newAuthor in currLineCommaSep:
         # add each author to list
         myAuthors.append(newAuthor.strip())
         count = count + 1
-        #print("") # empty line between
 
-#print("Total Authors: "+str(len(myAuthors)))
 numAuthors = len(myAuthors)
 # now that we have all authors, run deduplication -- print out likely matches
 for currAuthor in range(numAuthors):
