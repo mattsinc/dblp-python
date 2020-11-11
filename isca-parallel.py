@@ -67,7 +67,12 @@ def parallel_search(threadNum):
             # match
             for currAuthor in currAuthors:
                 count = 0 # reset count for each person
-                numPubs = len(currAuthor.publications)
+                try:
+                    numPubs = len(currAuthor.publications)
+                # if accessing number of publications failed, just skip this author
+                except:
+                    print("    ERROR: Thread "+threadNumStr+" can't access publications for "+person+", skipping")
+                    break;
                 ##print("    Thread "+threadNumStr+": "+str(numPubs)+" DBLP entries.  ISCA publications, if any:") # DEBUG PRINT
                 outFile_thr.write('    '+str(numPubs)+' DBLP entries.  ISCA publications, if any:\n') # DEBUG PRINT
 
