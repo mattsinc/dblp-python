@@ -16,10 +16,24 @@ class LazyAPIData(object):
         self.data = None
 
     def __getattr__(self, key):
+        timeoutCount1 = 0
+        passFail = 0
+        # if key fails to return properly, try again (up to 5 times)
         if key in self.lazy_attrs:
-            if self.data is None:
-                self.load_data()
-            return self.data[key]
+            while (passFail == 0):
+                try:
+                    if self.data is None:
+                        self.load_data()
+                    return self.data[key]
+                    passFail = 1
+                except:
+                    if (timeoutCount1 < 5):
+                        passFail = 0
+                        timeoutCount1 = timeoutCount1 + 1
+                    else:
+                        print("ERROR 1: failed to connect to DBLP 5+ times for"+str(self.urlpt)+", skipping")
+                        sleep(0.1 * timeoutCount1)
+                        passFail = 1
         raise AttributeError(key)
 
     def load_data(self):
