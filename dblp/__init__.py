@@ -1,6 +1,7 @@
 import requests
 from lxml import etree
 from collections import namedtuple
+from time import sleep
 
 DBLP_BASE_URL = 'http://dblp.uni-trier.de/'
 DBLP_AUTHOR_SEARCH_URL = DBLP_BASE_URL + 'search/author'
@@ -42,7 +43,7 @@ class Author(LazyAPIData):
                                       'homonyms'])
 
     def load_data(self):
-        timeoutCount = 0
+        timeoutCount2 = 0
         passFail = 0
         while (passFail == 0):
             try:
@@ -66,11 +67,12 @@ class Author(LazyAPIData):
                 passFail = 1
             # if connection times out or string is empty, try again until it works or failed 5 times
             except:
-                if (timeoutCount < 5):
+                if (timeoutCount2 < 5):
                     passFail = 0
-                    timeoutCount = timeoutCount + 1
+                    timeoutCount2 = timeoutCount2 + 1
                 else:
-                    print("ERROR: failed to connect to DBLP 5+ times for"+str(self.urlpt)+", skipping")
+                    print("ERROR 2: failed to connect to DBLP 5+ times for"+str(self.urlpt)+", skipping")
+                    sleep(0.1 * timeoutCount2)
                     passFail = 1
 
 def first_or_none(seq):
@@ -120,7 +122,7 @@ class Publication(LazyAPIData):
                 'series'])
 
     def load_data(self):
-        timeoutCount2 = 0
+        timeoutCount3 = 0
         passFail2 = 0
         while (passFail2 == 0):
             try:
@@ -164,38 +166,25 @@ class Publication(LazyAPIData):
                 passFail2 = 1
             # if connection times out or string is empty, try again until it works or failed 5 times
             except:
-                if (timeoutCount2 < 5):
+                if (timeoutCount3 < 5):
                     passFail2 = 0
-                    timeoutCount2 = timeoutCount2 + 1
+                    timeoutCount3 = timeoutCount3 + 1
                 else:
-                    print("ERROR: failed to connect to DBLP 5+ times for"+str(self.key)+", skipping")
+                    print("ERROR 3: failed to connect to DBLP 5+ times for"+str(self.key)+", skipping")
+                    sleep(0.1 * timeoutCount3)
                     passFail2 = 1
 
 def search(author_str):
-    timeoutCount3 = 0
+    timeoutCount4 = 0
     passFail3 = 0
     while (passFail3 == 0):
         try:
             resp = requests.get(DBLP_AUTHOR_SEARCH_URL, params={'xauthor':author_str})
-            passFail3 = 1
-        # if connection times out, try again until it works or failed 5 times
-        except:
-            if (timeoutCount3 < 5):
-                passFail3 = 0
-                timeoutCount3 = timeoutCount3 + 1
-            else:
-                print("ERROR: failed to connect to DBLP 5+ times for"+str(author_str)+", skipping")
-                passFail3 = 1
 
-    # TODO: Does this need to be a nested try-catch above with the resp?
-    #TODO error handling
-    root = etree.fromstring(resp.content)
-    arr_of_authors = []
-    for urlpt in root.xpath('/authors/author/@urlpt'):
-        timeoutCount4 = 0
-        passFail4 = 0
-        while (passFail4 == 0):
-            try:
+            #TODO error handling
+            root = etree.fromstring(resp.content)
+            arr_of_authors = []
+            for urlpt in root.xpath('/authors/author/@urlpt'):
                 resp1 = requests.get(DBLP_PERSON_URL.format(urlpt=urlpt))
 
                 xml = resp1.content
@@ -206,15 +195,16 @@ def search(author_str):
                 else:
                     arr_of_authors.append(Author(urlpt))
 
-                passFail4 = 1
+            passFail3 = 1
 
-            # if connection times out or string is empty, try again until it works or failed 5 times
-            except:
-                if (timeoutCount4 < 5):
-                    passFail4 = 0
-                    timeoutCount4 = timeoutCount4 + 1
-                else:
-                    print("ERROR: failed to connect to DBLP 5+ times for"+str(urlpt)+", skipping")
-                    passFail4 = 1
+        # if connection times out or string is empty, try again until it works or failed 5 times
+        except:
+            if (timeoutCount4 < 5):
+                passFail3 = 0
+                timeoutCount4 = timeoutCount4 + 1
+            else:
+                print("ERROR 4: failed to connect to DBLP 5+ times for"+str(author_str)+", skipping")
+                sleep(0.1 * timeoutCount4)
+                passFail3 = 1
 
     return arr_of_authors
