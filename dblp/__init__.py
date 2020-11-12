@@ -17,23 +17,23 @@ class LazyAPIData(object):
 
     def __getattr__(self, key):
         timeoutCount1 = 0
-        passFail = 0
+        passFail1 = 0
         # if key fails to return properly, try again (up to 5 times)
         if key in self.lazy_attrs:
-            while (passFail == 0):
+            while (passFail1 == 0):
                 try:
                     if self.data is None:
                         self.load_data()
                     return self.data[key]
-                    passFail = 1
+                    passFail1 = 1
                 except:
                     if (timeoutCount1 < 5):
-                        passFail = 0
+                        passFail1 = 0
                         timeoutCount1 = timeoutCount1 + 1
                     else:
                         print("ERROR 1: failed to connect to DBLP 5+ times for"+str(self.urlpt)+", skipping")
-                        sleep(0.1 * timeoutCount1)
-                        passFail = 1
+                        sleep(1 * timeoutCount1)
+                        passFail1 = 1
         raise AttributeError(key)
 
     def load_data(self):
@@ -58,8 +58,8 @@ class Author(LazyAPIData):
 
     def load_data(self):
         timeoutCount2 = 0
-        passFail = 0
-        while (passFail == 0):
+        passFail2 = 0
+        while (passFail2 == 0):
             try:
                 resp = requests.get(DBLP_PERSON_URL.format(urlpt=self.urlpt))
 
@@ -78,16 +78,16 @@ class Author(LazyAPIData):
 
                 self.data = data
 
-                passFail = 1
+                passFail2 = 1
             # if connection times out or string is empty, try again until it works or failed 5 times
             except:
                 if (timeoutCount2 < 5):
-                    passFail = 0
+                    passFail2 = 0
                     timeoutCount2 = timeoutCount2 + 1
                 else:
                     print("ERROR 2: failed to connect to DBLP 5+ times for"+str(self.urlpt)+", skipping")
-                    sleep(0.1 * timeoutCount2)
-                    passFail = 1
+                    sleep(1 * timeoutCount2)
+                    passFail2 = 1
 
 def first_or_none(seq):
     try:
@@ -137,8 +137,8 @@ class Publication(LazyAPIData):
 
     def load_data(self):
         timeoutCount3 = 0
-        passFail2 = 0
-        while (passFail2 == 0):
+        passFail3 = 0
+        while (passFail3 == 0):
             try:
                 resp = requests.get(DBLP_PUBLICATION_URL.format(key=self.key))
 
@@ -177,21 +177,21 @@ class Publication(LazyAPIData):
 
                 self.data = data
 
-                passFail2 = 1
+                passFail3 = 1
             # if connection times out or string is empty, try again until it works or failed 5 times
             except:
                 if (timeoutCount3 < 5):
-                    passFail2 = 0
+                    passFail3 = 0
                     timeoutCount3 = timeoutCount3 + 1
                 else:
                     print("ERROR 3: failed to connect to DBLP 5+ times for"+str(self.key)+", skipping")
-                    sleep(0.1 * timeoutCount3)
-                    passFail2 = 1
+                    sleep(1 * timeoutCount3)
+                    passFail3 = 1
 
 def search(author_str):
     timeoutCount4 = 0
-    passFail3 = 0
-    while (passFail3 == 0):
+    passFail4 = 0
+    while (passFail4 == 0):
         try:
             resp = requests.get(DBLP_AUTHOR_SEARCH_URL, params={'xauthor':author_str})
 
@@ -209,16 +209,16 @@ def search(author_str):
                 else:
                     arr_of_authors.append(Author(urlpt))
 
-            passFail3 = 1
+            passFail4 = 1
 
         # if connection times out or string is empty, try again until it works or failed 5 times
         except:
             if (timeoutCount4 < 5):
-                passFail3 = 0
+                passFail4 = 0
                 timeoutCount4 = timeoutCount4 + 1
             else:
                 print("ERROR 4: failed to connect to DBLP 5+ times for"+str(author_str)+", skipping")
-                sleep(0.1 * timeoutCount4)
-                passFail3 = 1
+                sleep(1 * timeoutCount4)
+                passFail4 = 1
 
     return arr_of_authors
