@@ -73,7 +73,7 @@ def parallel_search(threadNum):
                 count = 0 # reset count for each person
                 try:
                     numPubs = len(currAuthor.publications)
-                # if accessing number of publications failed, just skip this author
+                # if accessing number of publications failed, just skip this author so thread will proceed to next author in its partition
                 except:
                     print("    ERROR: Thread "+threadNumStr+" can't access publications for "+person+", skipping")
                     break;
