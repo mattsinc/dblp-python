@@ -60,6 +60,10 @@ def parallel_search(threadNum):
             if (numWithName > 1):
                 print("    WARNING: Thread "+threadNumStr+": "+person+" has multiple matches ("+str(numWithName)+") in DBLP")
                 outFile_thr.write('    WARNING: '+person+' has multiple matches ('+str(numWithName)+') in DBLP\n')
+            else:
+                # if DBLP can't find any matches, print a warning so we know to check the author entry
+                if (numWithName == 0):
+                    outFile_thr.write('    WARNING: '+person+' has no matches in DBLP, check author name\n')
 
             # since we don't know which of the current authors is the "right" one, search each of them
             # for ISCA publications -- this allows multiple people with the same name to be added, and
