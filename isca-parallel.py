@@ -73,10 +73,12 @@ def parallel_search(threadNum):
                 count = 0 # reset count for each person
                 try:
                     numPubs = len(currAuthor.publications)
-                # if accessing number of publications failed, just skip this author so thread will proceed to next author in its partition
+                # if accessing number of publications failed, just skip this author (or this option if multiple options with a given name)
+                # so thread will proceed to next author in its partition (or not option of authors with this name)
                 except:
-                    print("    ERROR: Thread "+threadNumStr+" can't access publications for "+person+", skipping")
-                    break;
+                    outFile_thr.write("    ERROR: Thread "+threadNumStr+" can't access publications for "+person+", skipping")
+                    #print("    ERROR: Thread "+threadNumStr+" can't access publications for "+person+", skipping")
+                    continue;
                 ##print("    Thread "+threadNumStr+": "+str(numPubs)+" DBLP entries.  ISCA publications, if any:") # DEBUG PRINT
                 outFile_thr.write('    '+str(numPubs)+' DBLP entries.  ISCA publications, if any:\n') # DEBUG PRINT
 
