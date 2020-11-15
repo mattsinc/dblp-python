@@ -112,8 +112,8 @@ def parallel_search(threadNum):
                             #with lockInsert:
                             chairList.insert(0, chairTuple)
 
-                if (count > 0):
-                    print("    Thread "+threadNumStr+": Total ISCA publications: "+str(count)) # DEBUG PRINT
+                #if (count > 0):
+                    #print("    Thread "+threadNumStr+": Total ISCA publications: "+str(count)) # DEBUG PRINT
                 outFile_thr.write('    Total ISCA publications: '+str(count)+'\n') # DEBUG PRINT
 
                 # just create a separate script to print out all entries for each person (or grab from debug prints above), instead of complicating data structures here
