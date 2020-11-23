@@ -85,10 +85,14 @@ def parallel_search(threadNum):
                 for i in range(numPubs):
                     # since the currAuthor fields are loaded lazily, need to access fields with a lock
                     with lock:
-                        conf = currAuthor.publications[i].booktitle
-                        title = currAuthor.publications[i].title
-                        year = currAuthor.publications[i].year
-                        pages = currAuthor.publications[i].pages
+                        try:
+                            conf = currAuthor.publications[i].booktitle
+                            title = currAuthor.publications[i].title
+                            year = currAuthor.publications[i].year
+                            pages = currAuthor.publications[i].pages
+                        except:
+                            print("ERROR: Thread "+threadNumStr+" unable to access current publication, skipping")
+                            continue
 
                     if (conf == "ISCA"):
                         # The Chair's Welcome is flagged as an ISCA publication, and the title is always "Proceedings of the ..."
