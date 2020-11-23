@@ -106,10 +106,19 @@ def parallel_search(threadNum):
                             # they are multiple pages
                             if ("-" in pages):
                                 count = count + 1
-                                outFile_thr.write('        '+str(count)+'. '+conf+' '+str(year)+': '+title+'\n')
+                                try:
+                                    title.encode('utf-8')
+                                    outFile_thr.write('        '+str(count)+'. '+conf+' '+str(year)+': '+title.encode('utf-8')+'\n')
+                                except:
+                                    print("Something failed when trying to write ISCA paper to file, printing fields one-by-one:")
+                                    print("    - count: "+str(count))
+                                    print("    - conf: "+str(conf))
+                                    print("    - year: "+str(year))
+                                    print("    - title: "+title.encode('utf-8'))
                             else:
+                                title.encode('utf-8')
                                 ##print("        Thread "+threadNumStr+": Ignoring "+conf+" "+str(year)+": "+title+", seems to be a keynote or abstract")
-                                outFile_thr.write('        Ignoring '+conf+' '+str(year)+': '+title+', seems to be a keynote or abstract\n')
+                                outFile_thr.write('        Ignoring '+conf+' '+str(year)+': '+title.encode('utf-8')+', seems to be a keynote or abstract\n')
                         # separately track the chairs
                         elif ((chairWelcome1 in title) or (chairWelcome2 in title)):
                             chairTuple = (person, year)
