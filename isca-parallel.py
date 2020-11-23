@@ -78,7 +78,7 @@ def parallel_search(threadNum):
                 except:
                     outFile_thr.write("    ERROR: Thread "+threadNumStr+" can't access publications for "+person+", skipping")
                     #print("    ERROR: Thread "+threadNumStr+" can't access publications for "+person+", skipping")
-                    continue;
+                    continue
                 ##print("    Thread "+threadNumStr+": "+str(numPubs)+" DBLP entries.  ISCA publications, if any:") # DEBUG PRINT
                 outFile_thr.write('    '+str(numPubs)+' DBLP entries.  ISCA publications, if any:\n') # DEBUG PRINT
 
