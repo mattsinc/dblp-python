@@ -57,14 +57,17 @@ class Author(LazyAPIData):
                                       'homonyms'])
 
     def load_data(self):
+        self.urlpt.encode('utf-8')
         timeoutCount2 = 0
         passFail2 = 0
         while (passFail2 == 0):
             try:
-                resp = requests.get(DBLP_PERSON_URL.format(urlpt=self.urlpt))
+                resp = requests.get(DBLP_PERSON_URL.format(urlpt=self.urlpt.encode('utf-8')))
 
                 # TODO error handling
+                resp.content.encode('utf-8')
                 xml = resp.content
+                xml.encode('utf-8')
                 self.xml = xml
                 root = etree.fromstring(xml)
                 data = {
@@ -85,7 +88,7 @@ class Author(LazyAPIData):
                     passFail2 = 0
                     timeoutCount2 = timeoutCount2 + 1
                 else:
-                    print("ERROR 2: failed to connect to DBLP 5+ times for"+str(self.urlpt)+", skipping")
+                    print("ERROR 2: failed to connect to DBLP 5+ times for: "+str(self.urlpt)+", URL: "+DBLP_PERSON_URL.format(urlpt=self.urlpt.encode('utf-8'))+", skipping")
                     sleep(1 * timeoutCount2)
                     passFail2 = 1
 
@@ -136,6 +139,7 @@ class Publication(LazyAPIData):
                 'series'])
 
     def load_data(self):
+        self.key.encode('utf-8')
         timeoutCount3 = 0
         passFail3 = 0
         while (passFail3 == 0):
@@ -184,11 +188,12 @@ class Publication(LazyAPIData):
                     passFail3 = 0
                     timeoutCount3 = timeoutCount3 + 1
                 else:
-                    print("ERROR 3: failed to connect to DBLP 5+ times for"+str(self.key)+", skipping")
+                    print("ERROR 3: failed to connect to DBLP 5+ times for: "+str(self.key)+", URL: "+DBLP_PUBLICATION_URL.format(key=self.key)+", skipping")
                     sleep(1 * timeoutCount3)
                     passFail3 = 1
 
 def search(author_str):
+    author_str.encode('utf-8')
     timeoutCount4 = 0
     passFail4 = 0
     while (passFail4 == 0):
@@ -217,7 +222,7 @@ def search(author_str):
                 passFail4 = 0
                 timeoutCount4 = timeoutCount4 + 1
             else:
-                print("ERROR 4: failed to connect to DBLP 5+ times for"+str(author_str)+", skipping")
+                print("ERROR 4: failed to connect to DBLP 5+ times for: "+str(author_str).encode('utf-8')+", skipping")
                 sleep(1 * timeoutCount4)
                 passFail4 = 1
 
