@@ -31,8 +31,8 @@ class LazyAPIData(object):
                         passFail1 = 0
                         timeoutCount1 = timeoutCount1 + 1
                     else:
-                        print("ERROR 1: failed to connect to DBLP 5+ times for"+str(self.urlpt)+", skipping")
-                        sleep(1 * timeoutCount1)
+                        print("ERROR 1: failed to connect to DBLP 5+ times for: "+str(self.urlpt)+", skipping")
+                        sleep(0.1 * timeoutCount1)
                         passFail1 = 1
         raise AttributeError(key)
 
@@ -89,7 +89,7 @@ class Author(LazyAPIData):
                     timeoutCount2 = timeoutCount2 + 1
                 else:
                     print("ERROR 2: failed to connect to DBLP 5+ times for: "+str(self.urlpt)+", URL: "+DBLP_PERSON_URL.format(urlpt=self.urlpt.encode('utf-8'))+", skipping")
-                    sleep(1 * timeoutCount2)
+                    sleep(0.1 * timeoutCount2)
                     passFail2 = 1
 
 def first_or_none(seq):
@@ -189,7 +189,7 @@ class Publication(LazyAPIData):
                     timeoutCount3 = timeoutCount3 + 1
                 else:
                     print("ERROR 3: failed to connect to DBLP 5+ times for: "+str(self.key)+", URL: "+DBLP_PUBLICATION_URL.format(key=self.key)+", skipping")
-                    sleep(1 * timeoutCount3)
+                    sleep(0.1 * timeoutCount3)
                     passFail3 = 1
 
 def search(author_str):
@@ -223,7 +223,7 @@ def search(author_str):
                 timeoutCount4 = timeoutCount4 + 1
             else:
                 print("ERROR 4: failed to connect to DBLP 5+ times for: "+str(author_str).encode('utf-8')+", skipping")
-                sleep(1 * timeoutCount4)
+                sleep(0.1 * timeoutCount4)
                 passFail4 = 1
 
     return arr_of_authors
